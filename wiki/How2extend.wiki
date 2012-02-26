@@ -1,0 +1,43 @@
+#summary a brief manual for extending openkad
+
+= Introduction =
+
+In this page, I will explain how to extend openkad by adding different operations and messages to it.
+
+
+= Handlers =
+Every incoming message is handled by the registered handlers.
+All handlers must extend the class _il.technion.ewolf.kbr.openkad.handlers.AbstractHandler_
+
+== Filters ==
+In this tutorial we will look at the simplest example: The ping handler.
+The job of the ping handler is to reply with a ping response to any incoming ping request.
+First, we would like our _PingHandler_ to notified only about _PingRequest_s and no other messages. To do this we implement the _getFilters_ method as such:
+{{{
+@Override
+protected Collection<MessageFilter> getFilters() {
+    return Arrays.asList(new MessageFilter[] {
+        new TypeMessageFilter(PingRequest.class)
+    });
+}
+}}}
+In the _getFilters_ method, we specify a list of all filters for our handler. In this case we have only one filter: a _TypeMessageFilter_ initiated with the _PingRequest_ message type. The _TypeMessageFilter_ will filter all messages with types different to the type it was initiated with. In our case, all messages with type different from _PingRequest_ will be filtered out and our handler will not handle them.
+
+== Handle ==
+After filtering out all unfit messages, our handler is left with the correct message it is willing to handle. The method _completed_ is invoke every time a message has arrived and all the filters did not filter the message out. In our case, the method will be invoked whenever a _PingRequest_ message has arrived. The _completed_ method 2 arguments are:
+ # The _KadMessage_ that has arrived
+ # An attachment, this will always be null
+The following is the implementation of the _completed_ method that send a _PingResponse_ back to the requester:
+{{{
+@Override
+public void completed(KadMessage msg, Void attachment) {
+    PingResponse pingResponse =((PingRequest)msg).generateResponse(localNode);		
+    try {
+        kadServer.send(msg.getSrc(), pingResponse);
+    } catch (IOException e) {
+        // failed to send the message, nothing to do
+        e.printStackTrace();
+    }
+}
+}}}
+In this method we generate the appropriate _PingResponse_ out of the incoming _PingRequest_ and send it to the back to the source using the _kadServer_ object.
