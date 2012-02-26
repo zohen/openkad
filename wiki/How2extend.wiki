@@ -21,13 +21,13 @@ protected Collection<MessageFilter> getFilters() {
     });
 }
 }}}
-In the _getFilters_ method, we specify a list of all filters for our handler. In this case we have only one filter: a TypeMessageFilter initiated with the PingRequest message type. The TypeMessageFilter will filter all messages with types different to the type it was initiated with. In our case, all messages with type different from PingRequest will be filtered out and our handler will not handle them.
+In the getFilters method, we specify a list of all filters for our handler. In this case we have only one filter: a TypeMessageFilter initiated with the PingRequest message type. The TypeMessageFilter will filter all messages with types different to the type it was initiated with. In our case, all messages with type different from PingRequest will be filtered out and our handler will not handle them.
 
 == Handle ==
-After filtering out all unfit messages, our handler is left with the correct message it is willing to handle. The method completed is invoke every time a message has arrived and all the filters did not filter the message out. In our case, the method will be invoked whenever a PingRequest message has arrived. The _completed_ method 2 arguments are:
- # The _KadMessage_ that has arrived
+After filtering out all unfit messages, our handler is left with the correct message it is willing to handle. The method completed is invoke every time a message has arrived and all the filters did not filter the message out. In our case, the method will be invoked whenever a PingRequest message has arrived. The completed method 2 arguments are:
+ # The KadMessage that has arrived
  # An attachment, this will always be null
-The following is the implementation of the completed method that send a _PingResponse back to the requester:
+The following is the implementation of the completed method that send a PingResponse back to the requester:
 {{{
 @Override
 public void completed(KadMessage msg, Void attachment) {
